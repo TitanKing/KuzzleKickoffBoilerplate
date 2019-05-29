@@ -247,7 +247,7 @@ installKuzzle() {
   cp -rf "${current_dir}/pm2.conf.yml" "${kuzzle_install_dir}"
 
   cd $kuzzle_install_dir
-  yarn install
+  npm install
 
   echo "[🐿] Installing modules..."
   git submodule init
@@ -256,7 +256,7 @@ installKuzzle() {
   # install dependencies for all enabled plugins
   for PLUGIN in ./plugins/enabled/*; do
     if [ -d "${PLUGIN}" ]; then
-      ( cd "${PLUGIN}" && yarn install )
+      ( cd "${PLUGIN}" && npm install )
     fi
   done
 

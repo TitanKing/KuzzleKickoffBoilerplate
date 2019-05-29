@@ -39,8 +39,6 @@ function main() {
   echo -e "${end_of_line}"
   installElasticsearch
   echo -e "${end_of_line}"
-  installYarn
-  echo -e "${end_of_line}"
   installKuzzle
   echo -e "${end_of_line}"
 
@@ -212,11 +210,9 @@ function installElasticsearch() {
 
 installYarn() {
   echo "[🐓] Installing Yarn..."
-  sudo apt remove cmdtest
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-  sudo apt-get update && sudo apt-get install yarn
-  echo "[✅] Finished installing yarn."
+  echo "[✅] Finished installing yarn..."
 }
 
 installKuzzle() {
@@ -247,7 +243,7 @@ installKuzzle() {
   cp -rf "${current_dir}/pm2.conf.yml" "${kuzzle_install_dir}"
 
   cd $kuzzle_install_dir
-  yarn install
+  npm install
 
   echo "[🐿] Installing modules..."
   git submodule init
@@ -256,7 +252,7 @@ installKuzzle() {
   # install dependencies for all enabled plugins
   for PLUGIN in ./plugins/enabled/*; do
     if [ -d "${PLUGIN}" ]; then
-      ( cd "${PLUGIN}" && yarn install )
+      ( cd "${PLUGIN}" && npm install )
     fi
   done
 

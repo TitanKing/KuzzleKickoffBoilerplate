@@ -39,8 +39,6 @@ function main() {
   echo -e "${end_of_line}"
   installElasticsearch
   echo -e "${end_of_line}"
-  installYarn
-  echo -e "${end_of_line}"
   installKuzzle
   echo -e "${end_of_line}"
 
@@ -71,7 +69,6 @@ function installUtils() {
   sudo apt install gdb
   sudo apt install python2.7
   sudo apt install libkrb5-dev
-  sudo apt install libzmq3-dev
   echo "[✅] Utils installed."
 }
 
@@ -119,7 +116,7 @@ function installRedis() {
   sudo cp -rf "${current_dir}/redis.conf" "/etc/redis"
 
   echo "[🐷] Starting redis service."
-  # sudo systemctl enable redis.service
+  sudo systemctl enable redis.service
   sudo systemctl stop redis.service
   sudo systemctl start redis.service
   echo "[✅] Redis service restarted."
@@ -200,7 +197,7 @@ function installElasticsearch() {
   sudo cp -rf "${current_dir}/elasticsearch.yml" "/etc/elasticsearch"
 
   echo "[🦕] Starting Elasticsearch services..."
-  # sudo systemctl enable elasticsearch.service
+  sudo systemctl enable elasticsearch.service
   sudo systemctl stop elasticsearch.service
   sudo systemctl start elasticsearch.service
   echo "[✅] Elastic service restarted."
@@ -208,15 +205,6 @@ function installElasticsearch() {
   sudo systemctl status elasticsearch
   echo "[⚠️] Press [q] to continue."
   journalctl -u elasticsearch
-}
-
-installYarn() {
-  echo "[🐓] Installing Yarn..."
-  sudo apt remove cmdtest
-  curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-  echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-  sudo apt-get update && sudo apt-get install yarn
-  echo "[✅] Finished installing yarn."
 }
 
 installKuzzle() {
@@ -247,7 +235,7 @@ installKuzzle() {
   cp -rf "${current_dir}/pm2.conf.yml" "${kuzzle_install_dir}"
 
   cd $kuzzle_install_dir
-  yarn install
+  npm install
 
   echo "[🐿] Installing modules..."
   git submodule init
@@ -256,7 +244,7 @@ installKuzzle() {
   # install dependencies for all enabled plugins
   for PLUGIN in ./plugins/enabled/*; do
     if [ -d "${PLUGIN}" ]; then
-      ( cd "${PLUGIN}" && yarn install )
+      ( cd "${PLUGIN}" && npm install )
     fi
   done
 
