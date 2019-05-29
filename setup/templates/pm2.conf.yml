@@ -1,0 +1,6 @@
+apps:
+  - name: kuzzle
+    script: {kuzzle_install_dir}/bin/kuzzle
+    args: start
+    env:
+      NODE_ENV: production
