@@ -266,7 +266,6 @@ installKuzzle() {
 
   echo "[🐿] Starting Kuzzle..."
   pm2 start pm2.conf.yml
-  echo "[🐿] Setting Kuzzle to autostart on boot..."
   pm2 save
   sudo pm2 startup systemd
 }

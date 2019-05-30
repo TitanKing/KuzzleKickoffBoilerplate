@@ -200,11 +200,9 @@ function installElasticsearch() {
   sudo cp -rf "${current_dir}/elasticsearch.yml" "/etc/elasticsearch"
 
   echo "[🦕] Starting Elasticsearch services..."
-
-  sudo systemctl stop elasticsearch.service
   sudo systemctl enable elasticsearch.service
+  sudo systemctl stop elasticsearch.service
   sudo systemctl start elasticsearch.service
-
   echo "[✅] Elastic service restarted."
   echo "[⚠️] Press [q] to continue."
   sudo systemctl status elasticsearch
@@ -266,9 +264,6 @@ installKuzzle() {
 
   echo "[🐿] Starting Kuzzle..."
   pm2 start pm2.conf.yml
-  echo "[🐿] Setting Kuzzle to autostart on boot..."
-  pm2 save
-  sudo pm2 startup systemd
 }
 
 function setupSettings() {
