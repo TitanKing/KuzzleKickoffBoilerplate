@@ -152,14 +152,14 @@ function copySslCertificate() {
 function requestSSHLogin() {
   login="ssh -p ${port} ${username}@${ip}"
   echo "[ℹ️] Now that we are such good friends, do you want to login to kuzzle server?"
-  echo "[ℹ️]  Once you are logged in just run ${to_folder}/install-kuzzle-stack.sh"
+  echo "[ℹ️]  Once you are logged in just run ${to_folder}/install.sh"
   read -rp "[🌱] So what will it be, login to ${login} [Y]: " ssh_login
 
   if [[ "$ssh_login" == "" ]]; then
     echo "[👍] Cheers, see you on the other side."
     eval $login
   else
-    echo "[🦋] Bye, all copying is done. Log in and run .${to_folder}/install-kuzzle-stack.sh"
+    echo "[🦋] Bye, all copying is done. Log in and run .${to_folder}/install.sh"
     exit
   fi
 }

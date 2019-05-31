@@ -1,0 +1,15 @@
+server {
+  listen 80 default_server;
+  listen [::]:80 default_server;
+  listen 443 ssl default_server;
+  listen [::]:443 ssl default_server;
+
+  root /var/www/{domain}/html;
+  index index.html index.htm index.nginx-debian.html;
+
+  server_name {domain};
+
+  location / {
+          try_files $uri $uri/ =404;
+  }
+}

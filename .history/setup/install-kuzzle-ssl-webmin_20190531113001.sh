@@ -1,9 +1,8 @@
 #!/bin/bash
 
 echo "------------------------------"
-echo "- Install hosting admin      -"
-echo "- to have kuzzle running     -"
-echo "- on a server.               -"
+echo "- Install hosting admin to   -"
+echo "- manage a kuzzle instance.  -"
 echo "-                            -"
 echo "- Ubuntu 18.04 LTS Required  -"
 echo "------------------------------"
@@ -13,9 +12,9 @@ echo "------------------------------"
 set -e
 
 function getCurrentDir() {
-    local current_dir="${BASH_SOURCE%/*}"
-    if [[ ! -d "${current_dir}" ]]; then current_dir="$PWD"; fi
-    echo "${current_dir}"
+  local current_dir="${BASH_SOURCE%/*}"
+  if [[ ! -d "${current_dir}" ]]; then current_dir="$PWD"; fi
+  echo "${current_dir}"
 }
 
 current_dir=$(getCurrentDir)
@@ -23,19 +22,21 @@ command_to_run=COMMAND_TO_INSTALL
 end_of_line="\n-------------------***-------------------\n"
 
 function main() {
-  includeDependencies
+  # includeDependencies
   echo -e "${end_of_line}"
-  updateAndUpgrade
+  # updateAndUpgrade
   echo -e "${end_of_line}"
-  installUtils
+  # installUtils
   echo -e "${end_of_line}"
-  installNode
+  # installNode
   echo -e "${end_of_line}"
-  installNginx
+  # installNginx
   echo -e "${end_of_line}"
-  adjustingFireWall
+  # adjustingFireWall
   echo -e "${end_of_line}"
   setupDomain
+  echo -e "${end_of_line}"
+  installKuzzleAdmin
   echo -e "${end_of_line}"
   installCertbot
   echo -e "${end_of_line}"
@@ -100,12 +101,13 @@ function setupDomain() {
     echo "[👍] Using domain: ${domain}"
   fi
 
-  cp -rf "${current_dir}/templates/reverse.proxy" "${current_dir}"
-  sed -i "s/{domain}/${domain}/" "${current_dir}/reverse.proxy"
-  mv "${current_dir}/reverse.proxy" "${domain}"
-  # sudo mkdir -p /var/www/${domain}
-  # sudo chown -R $USER:$USER /var/www/${domain}
-  # sudo chmod -R 755 /var/www/${domain}
+  cp -rf "${current_dir}/templates/webadmin.nqinx" "${current_dir}"
+  sed -i "s/{domain}/${domain}/" "${current_dir}/webadmin.nqinx"
+  sed -i "s#{domain}#${domain}#" "${current_dir}/webadmin.nqinx"
+  mv "${current_dir}/webadmin.nqinx" "${domain}"
+  sudo mkdir -p /var/www/${domain}/html
+  sudo chown -R $USER:$USER /var/www/${domain}
+  sudo chmod -R 755 /var/www/${domain}
   sudo cp -rf "${current_dir}/${domain}" /etc/nginx/sites-available/
   sudo rm -f /etc/nginx/sites-enabled/default
   sudo rm -f /etc/nginx/sites-enabled/${domain}
@@ -128,6 +130,18 @@ function generateSSLCertificates() {
   sudo nginx -t
   sudo systemctl restart nginx
   echo "[✅] Certbot setup complete."
+}
+
+function installKuzzleAdmin() {
+  echo "[😍] Installing Kuzzle Admin..."
+  cd /var/www/${domain}
+  git clone https://github.com/kuzzleio/kuzzle-admin-console html
+  cd html
+  npm install
+  npm run build
+  sudo nginx -t
+  sudo systemctl restart nginx
+  echo "[✅] Kuzzle Admin installation complete."
 }
 
 function includeDependencies() {
