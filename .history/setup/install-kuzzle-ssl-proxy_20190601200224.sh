@@ -86,7 +86,7 @@ function setupDomain() {
   cp -rf "${current_dir}/templates/reverseproxy.nginx" "${current_dir}"
   sed -i "s/{domain}/${domain}/" "${current_dir}/reverseproxy.nginx"
   sed -i "s/{kuzzle_port}/${kuzzle_port}/" "${current_dir}/reverseproxy.nginx"
-  mv "${current_dir}/reverseproxy.nginx" "${domain}"
+  mv "${current_dir}/reverseproxy.nqinx" "${domain}"
   # sudo mkdir -p /var/www/${domain}
   # sudo chown -R $USER:$USER /var/www/${domain}
   # sudo chmod -R 755 /var/www/${domain}
