@@ -1,9 +1,8 @@
 #!/bin/bash
 
 echo "------------------------------"
-echo "- Install hosting services   -"
-echo "- to have kuzzle running     -"
-echo "- on a server.               -"
+echo "- Install hosting admin to   -"
+echo "- manage a kuzzle instance.  -"
 echo "-                            -"
 echo "- Ubuntu 18.04 LTS Required  -"
 echo "------------------------------"
@@ -13,9 +12,9 @@ echo "------------------------------"
 set -e
 
 function getCurrentDir() {
-    local current_dir="${BASH_SOURCE%/*}"
-    if [[ ! -d "${current_dir}" ]]; then current_dir="$PWD"; fi
-    echo "${current_dir}"
+  local current_dir="${BASH_SOURCE%/*}"
+  if [[ ! -d "${current_dir}" ]]; then current_dir="$PWD"; fi
+  echo "${current_dir}"
 }
 
 current_dir=$(getCurrentDir)
@@ -25,17 +24,23 @@ end_of_line="\n-------------------***-------------------\n"
 function main() {
   includeDependencies
   echo -e "${end_of_line}"
-  updateAndUpgrade
+  # updateAndUpgrade
   echo -e "${end_of_line}"
-  installNginx
+  # installUtils
   echo -e "${end_of_line}"
-  adjustingFireWall
+  # installNode
   echo -e "${end_of_line}"
-  setupDomain
+  # installNginx
   echo -e "${end_of_line}"
-  installCertbot
+  # adjustingFireWall
   echo -e "${end_of_line}"
-  generateSSLCertificates
+  # setupDomain
+  echo -e "${end_of_line}"
+  installKuzzleAdmin
+  echo -e "${end_of_line}"
+  # installCertbot
+  echo -e "${end_of_line}"
+  # generateSSLCertificates
   echo -e "${end_of_line}"
 }
 
@@ -44,6 +49,29 @@ function updateAndUpgrade() {
 
   sudo apt-get update
   sudo apt-get upgrade
+}
+
+function installUtils() {
+  echo "[⚙️] Installing utilities..."
+  sudo apt install git
+  sudo apt install build-essential
+  sudo apt install gdb
+  sudo apt install python2.7
+  sudo apt install libkrb5-dev
+  sudo apt install libzmq3-dev
+  echo "[✅] Utils installed."
+}
+
+function installNode() {
+  echo "[🐤] Installing Node..."
+  # curl -sL https://deb.nodesource.com/setup_10.x -o nodesource_setup.sh
+  # sudo bash nodesource_setup.sh
+
+  sudo apt install nodejs
+  sudo apt install npm
+  # sudo npm install -g pm2
+
+  echo "[✅] Node installed."
 }
 
 function installNginx() {
@@ -73,24 +101,12 @@ function setupDomain() {
     echo "[👍] Using domain: ${domain}"
   fi
 
-  echo "[ℹ️] Remember Kuzzle will listen internally on port 127.0.0.1:7512 - "
-  echo "[ℹ️] The port entered here will be the one it will listen for externally - "
-  read -rp "[💥] Enter the external port for the kuzzle server [${KUZZLE_LISTENING_PORT}]: " kuzzle_port
-
-  if [[ "$kuzzle_port" == "" ]]; then
-    kuzzle_port="${KUZZLE_LISTENING_PORT}"
-    echo "[⭐️] Using default port: ${kuzzle_port}"
-  else
-    echo "[👍] Using port: ${kuzzle_port}"
-  fi
-
-  cp -rf "${current_dir}/templates/reverseproxy.nqinx" "${current_dir}"
-  sed -i "s/{domain}/${domain}/" "${current_dir}/reverseproxy.nqinx"
-  sed -i "s/{kuzzle_port}/${kuzzle_port}/" "${current_dir}/reverseproxy.nqinx"
-  mv "${current_dir}/reverseproxy.nqinx" "${domain}"
-  # sudo mkdir -p /var/www/${domain}
-  # sudo chown -R $USER:$USER /var/www/${domain}
-  # sudo chmod -R 755 /var/www/${domain}
+  cp -rf "${current_dir}/templates/webadmin.nqinx" "${current_dir}"
+  sed -i "s/{domain}/${domain}/" "${current_dir}/webadmin.nqinx"
+  mv "${current_dir}/webadmin.nqinx" "${domain}"
+  sudo mkdir -p /var/www/${domain}/html
+  sudo chown -R $USER:$USER /var/www/${domain}
+  sudo chmod -R 755 /var/www/${domain}
   sudo cp -rf "${current_dir}/${domain}" /etc/nginx/sites-available/
   sudo rm -f /etc/nginx/sites-enabled/default
   sudo rm -f /etc/nginx/sites-enabled/${domain}
@@ -113,6 +129,17 @@ function generateSSLCertificates() {
   sudo nginx -t
   sudo systemctl restart nginx
   echo "[✅] Certbot setup complete."
+}
+
+function installKuzzleAdmin() {
+  echo "[😍] Installing Kuzzle Admin..."
+  git clone https://github.com/kuzzleio/kuzzle-admin-console buildKuzzle
+  npm install --prefix buildKuzzle
+  npm run build --prefix buildKuzzle
+  cp -rf "${current_dir}/buildKuzzle/dist" /var/www/${domain}/html
+  sudo nginx -t
+  sudo systemctl restart nginx
+  echo "[✅] Kuzzle Admin installation complete."
 }
 
 function includeDependencies() {

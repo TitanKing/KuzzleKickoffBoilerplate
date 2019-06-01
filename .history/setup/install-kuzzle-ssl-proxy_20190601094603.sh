@@ -86,7 +86,6 @@ function setupDomain() {
 
   cp -rf "${current_dir}/templates/reverseproxy.nqinx" "${current_dir}"
   sed -i "s/{domain}/${domain}/" "${current_dir}/reverseproxy.nqinx"
-  sed -i "s/{kuzzle_port}/${kuzzle_port}/" "${current_dir}/reverseproxy.nqinx"
   mv "${current_dir}/reverseproxy.nqinx" "${domain}"
   # sudo mkdir -p /var/www/${domain}
   # sudo chown -R $USER:$USER /var/www/${domain}

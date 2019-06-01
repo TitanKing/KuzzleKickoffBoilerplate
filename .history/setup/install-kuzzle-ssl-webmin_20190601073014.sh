@@ -133,8 +133,8 @@ function generateSSLCertificates() {
 
 function installKuzzleAdmin() {
   echo "[😍] Installing Kuzzle Admin..."
-  cd /var/www/${domain}
-  git clone https://github.com/kuzzleio/kuzzle-admin-console html
+  # cd /var/www/${domain}
+  git clone https://github.com/kuzzleio/kuzzle-admin-console build
   cd html
   npm install
   npm run build

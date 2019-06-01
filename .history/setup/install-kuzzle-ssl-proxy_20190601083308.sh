@@ -73,21 +73,9 @@ function setupDomain() {
     echo "[👍] Using domain: ${domain}"
   fi
 
-  echo "[ℹ️] Remember Kuzzle will listen internally on port 127.0.0.1:7512 - "
-  echo "[ℹ️] The port entered here will be the one it will listen for externally - "
-  read -rp "[💥] Enter the external port for the kuzzle server [${KUZZLE_LISTENING_PORT}]: " kuzzle_port
-
-  if [[ "$kuzzle_port" == "" ]]; then
-    kuzzle_port="${KUZZLE_LISTENING_PORT}"
-    echo "[⭐️] Using default port: ${kuzzle_port}"
-  else
-    echo "[👍] Using port: ${kuzzle_port}"
-  fi
-
-  cp -rf "${current_dir}/templates/reverseproxy.nqinx" "${current_dir}"
-  sed -i "s/{domain}/${domain}/" "${current_dir}/reverseproxy.nqinx"
-  sed -i "s/{kuzzle_port}/${kuzzle_port}/" "${current_dir}/reverseproxy.nqinx"
-  mv "${current_dir}/reverseproxy.nqinx" "${domain}"
+  cp -rf "${current_dir}/templates/webadmin.nqinx" "${current_dir}"
+  sed -i "s/{domain}/${domain}/" "${current_dir}/webadmin.nqinx"
+  mv "${current_dir}/webadmin.nqinx" "${domain}"
   # sudo mkdir -p /var/www/${domain}
   # sudo chown -R $USER:$USER /var/www/${domain}
   # sudo chmod -R 755 /var/www/${domain}
